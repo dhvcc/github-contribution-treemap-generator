@@ -1,0 +1,22 @@
+{
+  "name": "github-contribution-treemap-generator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "CLI to generate a GitHub contribution treemap SVG",
+  "bin": {
+    "gh-contrib-treemap": "generate_treemap_svg.mjs"
+  },
+  "scripts": {
+    "local": "node -r dotenv/config generate_treemap_svg.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "d3-hierarchy": "^3.1.2"
+  },
+  "devDependencies": {
+    "dotenv": "*"
+  }
+}
