@@ -13,7 +13,8 @@ const WIDTH = 465;
 const HEIGHT = 165;
 const CANVAS_BG = '#21232A';
 const ACCENT = '#58BCDA';
-const TILE_DEFAULT = '#31343C';
+const HEAT_MIN = '#31343C';
+const HEAT_MAX = '#58BCDA';
 const TEXT_PRIMARY = '#FFFFFF';
 const TEXT_SECONDARY = 'rgba(255,255,255,0.75)';
 const FONT_FAMILY = "'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif";
@@ -162,12 +163,26 @@ async function searchRepositoriesByPRs({ query, token }) {
 async function fetchAllTimeContributedRepositories({ username, token }) {
 	const authoredQuery = `is:pr is:merged author:${username}`;
 	const authored = await searchRepositoriesByPRs({ query: authoredQuery, token });
-	const map = new Map();
+	const byRepo = new Map();
 	for (const r of authored) {
-		const key = (r.nameWithOwner || `${r.owner?.login}/${r.name}`).toLowerCase();
-		if (!map.has(key)) map.set(key, r);
+		const owner = r.owner?.login || (r.nameWithOwner?.split('/')?.[0] ?? '');
+		const name = r.name || (r.nameWithOwner?.split('/')?.[1] ?? '');
+		const key = `${owner}/${name}`.toLowerCase();
+		const existing = byRepo.get(key);
+		if (existing) {
+			existing.contribs += 1;
+		} else {
+			byRepo.set(key, {
+				name,
+				nameWithOwner: `${owner}/${name}`,
+				stargazerCount: r.stargazerCount || 0,
+				isFork: r.isFork || false,
+				owner: { login: owner },
+				contribs: 1,
+			});
+		}
 	}
-	return Array.from(map.values());
+	return Array.from(byRepo.values());
 }
 
 function normalizeRepositories(repos, { username, excludeReposSet, hideOwnersSet }) {
@@ -187,6 +202,7 @@ function normalizeRepositories(repos, { username, excludeReposSet, hideOwnersSet
 			label: name,
 			owner,
 			stars: Math.max(0, Number(r.stargazerCount || 0)),
+			contribs: Math.max(0, Number(r.contribs || 0)),
 			isOwnedByUser,
 		});
 	}
@@ -200,11 +216,45 @@ function computeTreemapLayout(items) {
 	return treemap().tile(treemapBinary).size([WIDTH, HEIGHT]).paddingInner(2).round(true)(root);
 }
 
+function hexToRgb(hex) {
+	const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if (!m) return { r: 0, g: 0, b: 0 };
+	return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+}
+
+function rgbToHex(r, g, b) {
+	const toHex = (v) => v.toString(16).padStart(2, '0');
+	return `#${toHex(Math.max(0, Math.min(255, Math.round(r))))}${toHex(Math.max(0, Math.min(255, Math.round(g))))}${toHex(
+		Math.max(0, Math.min(255, Math.round(b)))
+	)}`;
+}
+
+function interpolateHexColor(minHex, maxHex, t) {
+	const a = hexToRgb(minHex);
+	const b = hexToRgb(maxHex);
+	const clamped = Math.max(0, Math.min(1, t || 0));
+	const r = a.r + (b.r - a.r) * clamped;
+	const g = a.g + (b.g - a.g) * clamped;
+	const bb = a.b + (b.b - a.b) * clamped;
+	return rgbToHex(r, g, bb);
+}
+
 function renderSvgFromTreemapLeaves(leaves) {
 	const padding = 4;
 	let rects = '';
 	let clips = '';
 	let texts = '';
+
+	// Heat range across all leaves
+	let minContrib = Infinity;
+	let maxContrib = -Infinity;
+	for (const node of leaves) {
+		const c = Math.max(0, Number(node?.data?.contribs || 0));
+		if (c < minContrib) minContrib = c;
+		if (c > maxContrib) maxContrib = c;
+	}
+	if (!isFinite(minContrib)) minContrib = 0;
+	if (!isFinite(maxContrib)) maxContrib = 0;
 
 	leaves.forEach((node, idx) => {
 		const d = node.data;
@@ -213,7 +263,14 @@ function renderSvgFromTreemapLeaves(leaves) {
 		const w = Math.max(2, Math.floor(node.x1 - node.x0));
 		const h = Math.max(2, Math.floor(node.y1 - node.y0));
 		const id = `clip_${idx}`;
-		const fill = d.isOwnedByUser ? ACCENT : TILE_DEFAULT;
+		let heatT = 0;
+		if (maxContrib === minContrib) {
+			heatT = maxContrib > 0 ? 1 : 0;
+		} else {
+			const c = Math.max(0, Number(d.contribs || 0));
+			heatT = (c - minContrib) / Math.max(1, maxContrib - minContrib);
+		}
+		const fill = interpolateHexColor(HEAT_MIN, HEAT_MAX, heatT);
 		rects += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`;
 		clips += `<clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`;
 
