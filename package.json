@@ -49,6 +49,7 @@
     "url": "https://github.com/dhvcc/contribution-treemap-generator/issues"
   },
   "dependencies": {
+    "@octokit/graphql": "7.1.1",
     "commander": "^11.0.0",
     "d3-hierarchy": "^3.1.2"
   },
@@ -57,10 +58,10 @@
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "dotenv": "*",
     "eslint": "^8.0.0",
     "prettier": "^3.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "dotenv": "*"
+    "typescript": "^5.0.0"
   }
 }

@@ -1,4 +1,5 @@
 import type { Repository, GitHubConfig } from './types';
+import { graphql } from '@octokit/graphql';
 
 export class GitHubClient {
   private token: string;
@@ -12,54 +13,35 @@ export class GitHubClient {
   }
 
   private async graphql<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
+    const client = graphql.defaults({
+      url: this.baseUrl,
+      headers: {
+        authorization: `token ${this.token}`,
+        'user-agent': 'github-contribution-treemap-generator',
+      },
+      request: {
+        timeout: this.timeoutMs,
+      },
+    });
+
     const maxAttempts = 3;
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
       try {
-        const response = await fetch(this.baseUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`,
-            'User-Agent': 'github-contribution-treemap-generator',
-          },
-          body: JSON.stringify({ query, variables }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-
-        if (!response.ok) {
-          const text = await response.text().catch(() => '');
-          // Retry on server errors
-          if (response.status >= 500 && response.status < 600 && attempt < maxAttempts) {
-            await new Promise((r) => setTimeout(r, attempt * 500));
-            continue;
-          }
-          throw new Error(`GitHub GraphQL error ${response.status}: ${text}`);
-        }
-
-        const data = await response.json();
-        if (data.errors) {
-          // Do not retry on GraphQL semantic errors
-          throw new Error('GitHub GraphQL errors: ' + JSON.stringify(data.errors));
-        }
-
-        return data.data;
-      } catch (err) {
-        clearTimeout(timeout);
+        return await client<T>(query, variables);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
         lastError = err;
-        // Retry on abort/network only
-        const name = (err as { name?: string })?.name;
-        if ((name === 'AbortError' || name === 'FetchError') && attempt < maxAttempts) {
+        const status = typeof err?.status === 'number' ? err.status : undefined;
+        if (status && status >= 500 && status < 600 && attempt < maxAttempts) {
           await new Promise((r) => setTimeout(r, attempt * 500));
           continue;
         }
         break;
       }
     }
+
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
