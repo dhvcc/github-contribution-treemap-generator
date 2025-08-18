@@ -1,22 +1,66 @@
 {
-  "name": "github-contribution-treemap-generator",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@dhvcc/github-contribution-treemap-generator",
+  "version": "1.0.0",
+  "description": "GitHub contribution treemap SVG generator",
   "type": "module",
-  "description": "CLI to generate a GitHub contribution treemap SVG",
-  "bin": {
-    "gh-contrib-treemap": "generate_treemap_svg.mjs"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cli": "./dist/cli.js"
   },
+  "bin": {
+    "github-contribution-treemap-generator": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "local": "node -r dotenv/config generate_treemap_svg.mjs"
+    "build": "tsc && tsup",
+    "local": "tsc && tsup && node -r dotenv/config ./dist/cli.js -o treemap.svg",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src",
+    "type-check": "tsc --noEmit",
+    "treemap": "npm run build && node dist/cli.js"
   },
   "engines": {
     "node": ">=18"
   },
+  "keywords": [
+    "github",
+    "contributions",
+    "treemap",
+    "svg",
+    "visualization"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhvcc/contribution-treemap-generator.git"
+  },
+  "homepage": "https://github.com/dhvcc/contribution-treemap-generator#readme",
+  "bugs": {
+    "url": "https://github.com/dhvcc/contribution-treemap-generator/issues"
+  },
   "dependencies": {
+    "commander": "^11.0.0",
     "d3-hierarchy": "^3.1.2"
   },
   "devDependencies": {
+    "@types/d3-hierarchy": "^3.1.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
     "dotenv": "*"
   }
 }
