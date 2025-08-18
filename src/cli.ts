@@ -4,20 +4,11 @@ import { Command, Option, InvalidOptionArgumentError } from 'commander';
 import { generateContributionTreemap } from './index.js';
 import { writeFileSync } from 'fs';
 import process from 'node:process';
-import { createRequire } from 'node:module';
 import { DEFAULT_CONFIG, DEFAULT_GITHUB_CONFIG } from './constants.js';
 
-const require = createRequire(import.meta.url);
-let pkgVersion = process.env.npm_package_version;
-try {
-  if (!pkgVersion) {
-    // Resolve package version at runtime from package.json included in the published package
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pkg = require('../package.json');
-    pkgVersion = pkg.version;
-  }
-} catch {}
-const VERSION = pkgVersion || '0.0.0';
+// Injected at build time via tsup define
+declare const __VERSION__: string | undefined;
+const VERSION = typeof __VERSION__ === 'string' && __VERSION__ ? __VERSION__ : '0.0.0';
 
 // Parsers
 const parsePositiveInt = (value: string): number => {

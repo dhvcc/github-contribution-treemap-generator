@@ -33,7 +33,7 @@ export class GitHubClient {
 
         if (!response.ok) {
           const text = await response.text().catch(() => '');
-          // Retry on transient server errors
+          // Retry on server errors
           if (response.status >= 500 && response.status < 600 && attempt < maxAttempts) {
             await new Promise((r) => setTimeout(r, attempt * 500));
             continue;
@@ -52,7 +52,7 @@ export class GitHubClient {
         clearTimeout(timeout);
         lastError = err;
         // Retry on abort/network only
-        const name = (err as any)?.name;
+        const name = (err as { name?: string })?.name;
         if ((name === 'AbortError' || name === 'FetchError') && attempt < maxAttempts) {
           await new Promise((r) => setTimeout(r, attempt * 500));
           continue;

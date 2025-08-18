@@ -44,7 +44,6 @@ export async function generateContributionTreemap(
     githubBaseUrl = DEFAULT_GITHUB_CONFIG.baseUrl,
   } = options;
 
-  // Initialize GitHub client
   const github = new GitHubClient({
     token,
     timeoutMs,
@@ -52,10 +51,8 @@ export async function generateContributionTreemap(
   });
   const resolvedUsername = await github.resolveUsername(username);
 
-  // Fetch repository data
   const rawRepos = await github.fetchAllTimeContributedRepositories(resolvedUsername);
 
-  // Normalize and filter repositories
   const normalizedRepos = normalizeRepositories(rawRepos, {
     username: resolvedUsername,
     excludeReposSet: new Set(excludeRepos.map((s) => s.toLowerCase())),
@@ -67,16 +64,14 @@ export async function generateContributionTreemap(
     return renderer.render([]);
   }
 
-  // Compute treemap layout
   const layout = computeTreemapLayout(normalizedRepos, width, height);
 
-  // Render SVG
   const renderer = new TreemapRenderer({ ...config, width, height });
   return renderer.render(layout.leaves());
 }
 
 /**
- * Helper function to normalize repository data
+ * Normalize repository data
  */
 function normalizeRepositories(
   repos: import('./types').Repository[],
