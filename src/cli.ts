@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { Command, Option, InvalidOptionArgumentError } from 'commander';
 import { generateContributionTreemap } from './index.js';
 import { writeFileSync } from 'fs';
