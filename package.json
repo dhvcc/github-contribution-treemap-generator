@@ -1,6 +1,6 @@
 {
   "name": "@dhvcc/github-contribution-treemap-generator",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "GitHub contribution treemap SVG generator",
   "type": "module",
   "main": "dist/index.js",
