@@ -19,6 +19,9 @@
     "dist",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc && tsup",
     "local": "tsc && tsup && node -r dotenv/config ./dist/cli.js -o treemap.svg",

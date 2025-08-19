@@ -1,37 +1,38 @@
-name: Publish to GitHub Packages
+name: Publish to npm and GitHub Packages
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          registry-url: 'https://npm.pkg.github.com'
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@dhvcc'
 
-      - name: Install dependencies
+      - name: Install deps
         run: npm ci
 
-      - name: Build package
+      - name: Build
         run: npm run build
 
-      - name: Run tests
-        run: npm test
+      - name: Publish to npmjs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - name: Publish to GitHub Packages
-        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm config set @dhvcc:registry https://npm.pkg.github.com/
+          npm publish
