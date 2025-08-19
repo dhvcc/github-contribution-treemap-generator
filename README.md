@@ -94,3 +94,7 @@ const svg = await generateContributionTreemap(process.env.GITHUB_TOKEN!, {
 
 - Public data only. A basic token is fine for public repos
 - Uses GitHub GraphQL search for merged PRs you authored (`is:pr is:merged author:<you>`)
+
+## License
+
+[GPLv3](./LICENSE)
