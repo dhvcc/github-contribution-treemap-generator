@@ -56,7 +56,7 @@ Environment variables:
   HEIGHT                 SVG height in pixels (default 165)
   GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default 15000)
   GITHUB_BASE_URL        GitHub GraphQL API base URL (default https://api.github.com/graphql)
-  QUIET=1                Suppress non-error logs
+  QUIET=0                Suppress non-error logs
 
 ```
 
