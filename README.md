@@ -37,13 +37,13 @@ github-contribution-treemap-generator -o treemap.svg
 - `--exclude-owners <a,b>`: Comma list of owners to hide (e.g. orgs)
 - `--timeout <ms>`: GitHub API timeout (default: 15000)
 - `--github-base-url <url>`: GraphQL base URL (GHE: `https://github.yourco.com/api/graphql`)
-- `-v, --verbose` / `-q, --quiet`
+- `-q, --quiet`
 
 Env vars:
 
 ```text
 GITHUB_TOKEN, GITHUB_USERNAME, EXCLUDE_REPOS, EXCLUDE_OWNERS,
-WIDTH, HEIGHT, GITHUB_TIMEOUT_MS, GITHUB_BASE_URL, VERBOSE, QUIET, DEBUG
+WIDTH, HEIGHT, GITHUB_TIMEOUT_MS, GITHUB_BASE_URL, QUIET
 ```
 
 ## Examples

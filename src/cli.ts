@@ -53,11 +53,10 @@ async function main() {
         .argParser(parsePositiveInt)
     )
     .addOption(new Option('--github-base-url <url>', 'GitHub GraphQL API base URL').env('GITHUB_BASE_URL').default(DEFAULT_GITHUB_CONFIG.baseUrl))
-    .addOption(new Option('-v, --verbose', 'Enable verbose logs').conflicts('quiet'))
-    .addOption(new Option('-q, --quiet', 'Suppress non-error logs').conflicts('verbose'))
+    .addOption(new Option('-q, --quiet', 'Suppress non-error logs'))
     .addHelpText(
       'after',
-      `\nEnvironment variables:\n  GITHUB_TOKEN           Required unless --token is provided\n  GITHUB_USERNAME        Username, otherwise auto-detected from token\n  EXCLUDE_REPOS          Comma-separated repos to exclude (default: none)\n  EXCLUDE_OWNERS            Comma-separated owners to hide (default: none)\n  WIDTH                  SVG width in pixels (default ${DEFAULT_CONFIG.width})\n  HEIGHT                 SVG height in pixels (default ${DEFAULT_CONFIG.height})\n  GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default ${DEFAULT_GITHUB_CONFIG.timeoutMs})\n  GITHUB_BASE_URL        GitHub GraphQL API base URL (default ${DEFAULT_GITHUB_CONFIG.baseUrl})\n  VERBOSE=1              Enable verbose logs\n  QUIET=1                Suppress non-error logs\n  DEBUG=1                Alias for verbose`
+      `\nEnvironment variables:\n  GITHUB_TOKEN           Required unless --token is provided\n  GITHUB_USERNAME        Username, otherwise auto-detected from token\n  EXCLUDE_REPOS          Comma-separated repos to exclude (default: none)\n  EXCLUDE_OWNERS            Comma-separated owners to hide (default: none)\n  WIDTH                  SVG width in pixels (default ${DEFAULT_CONFIG.width})\n  HEIGHT                 SVG height in pixels (default ${DEFAULT_CONFIG.height})\n  GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default ${DEFAULT_GITHUB_CONFIG.timeoutMs})\n  GITHUB_BASE_URL        GitHub GraphQL API base URL (default ${DEFAULT_GITHUB_CONFIG.baseUrl})\n  QUIET=1                Suppress non-error logs\n`
     )
     .showHelpAfterError()
     .showSuggestionAfterError();
@@ -73,12 +72,9 @@ async function main() {
     excludeOwners: string[] | string;
     timeout: number;
     githubBaseUrl: string;
-    verbose?: boolean;
     quiet?: boolean;
   };
 
-  // Env toggles for booleans (commander doesn't map these by default)
-  if (!options.verbose && (process.env.DEBUG === '1' || process.env.VERBOSE === '1')) options.verbose = true;
   if (!options.quiet && process.env.QUIET === '1') options.quiet = true;
 
   // Normalize arrays (parser ensures array or empty)
