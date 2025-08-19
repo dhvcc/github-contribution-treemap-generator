@@ -8,6 +8,10 @@ GitHub contributions as an SVG treemap. Built with [d3](https://github.com/d3/d3
 
 It counts merged PRs you authored across repos, sizes by your contributions, and colors by repo stars.
 
+![Version](https://img.shields.io/github/package-json/version/dhvcc/github-contribution-treemap-generator)
+![NPM/GitHub publish](https://github.com/dhvcc/github-contribution-treemap-generator/actions/workflows/publish.yml/badge.svg)
+
+
 ## Install
 
 ```bash
