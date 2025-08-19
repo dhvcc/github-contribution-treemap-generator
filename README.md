@@ -26,24 +26,38 @@ github-contribution-treemap-generator -o treemap.svg
 - Without `-o`, SVG goes to stdout
 - If you don't pass `--username`, it auto-detects from the token
 
-## CLI options
+## Usage
 
-- `-t, --token <token>`: GitHub token (or `GITHUB_TOKEN`)
-- `-u, --username <username>`: GitHub username (or `GITHUB_USERNAME`)
-- `-o, --output <file>`: Output file (default: stdout)
-- `-w, --width <px>`: SVG width (default: 465)
-- `--height <px>`: SVG height (default: 165)
-- `--exclude-repos <a,b>`: Comma list of repos to exclude (name or `owner/name`)
-- `--exclude-owners <a,b>`: Comma list of owners to hide (e.g. orgs)
-- `--timeout <ms>`: GitHub API timeout (default: 15000)
-- `--github-base-url <url>`: GraphQL base URL (GHE: `https://github.yourco.com/api/graphql`)
-- `-q, --quiet`
+```man
+Usage: github-contribution-treemap-generator [options]
 
-Env vars:
+GitHub contribution treemap SVG generator
 
-```text
-GITHUB_TOKEN, GITHUB_USERNAME, EXCLUDE_REPOS, EXCLUDE_OWNERS,
-WIDTH, HEIGHT, GITHUB_TIMEOUT_MS, GITHUB_BASE_URL, QUIET
+Options:
+  -V, --version              output the version number
+  -t, --token <token>        GitHub personal access token (env: GITHUB_TOKEN)
+  -u, --username <username>  GitHub username (auto-detected if not provided) (env: GITHUB_USERNAME)
+  -o, --output <file>        Output file path (default: stdout)
+  -w, --width <pixels>       SVG width in pixels (default: 465, env: WIDTH)
+  --height <pixels>          SVG height in pixels (default: 165, env: HEIGHT)
+  --exclude-repos <repos>    Comma-separated list of repos to exclude (default: none) (default: "", env: EXCLUDE_REPOS)
+  --exclude-owners <owners>  Comma-separated list of owners to hide (default: none) (default: "", env: EXCLUDE_OWNERS)
+  --timeout <ms>             GitHub API timeout in milliseconds (default: 15000, env: GITHUB_TIMEOUT_MS)
+  --github-base-url <url>    GitHub GraphQL API base URL (default: "https://api.github.com/graphql", env: GITHUB_BASE_URL)
+  -q, --quiet                Suppress non-error logs
+  -h, --help                 display help for command
+
+Environment variables:
+  GITHUB_TOKEN           Required unless --token is provided
+  GITHUB_USERNAME        Username, otherwise auto-detected from token
+  EXCLUDE_REPOS          Comma-separated repos to exclude (default: none)
+  EXCLUDE_OWNERS            Comma-separated owners to hide (default: none)
+  WIDTH                  SVG width in pixels (default 465)
+  HEIGHT                 SVG height in pixels (default 165)
+  GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default 15000)
+  GITHUB_BASE_URL        GitHub GraphQL API base URL (default https://api.github.com/graphql)
+  QUIET=1                Suppress non-error logs
+
 ```
 
 ## Examples
