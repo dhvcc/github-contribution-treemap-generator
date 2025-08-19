@@ -44,8 +44,8 @@ async function main() {
         .default(DEFAULT_CONFIG.height)
         .argParser(parsePositiveInt)
     )
-    .addOption(new Option('-e, --exclude-repos <repos>', 'Comma-separated list of repos to exclude (default: none)').env('EXCLUDE_REPOS').default('').argParser(parseList))
-    .addOption(new Option('-H, --hide-owners <owners>', 'Comma-separated list of owners to hide (default: none)').env('HIDE_OWNERS').default('').argParser(parseList))
+    .addOption(new Option('--exclude-repos <repos>', 'Comma-separated list of repos to exclude (default: none)').env('EXCLUDE_REPOS').default('').argParser(parseList))
+    .addOption(new Option('--exclude-owners <owners>', 'Comma-separated list of owners to hide (default: none)').env('EXCLUDE_OWNERS').default('').argParser(parseList))
     .addOption(
       new Option('--timeout <ms>', 'GitHub API timeout in milliseconds')
         .env('GITHUB_TIMEOUT_MS')
@@ -57,7 +57,7 @@ async function main() {
     .addOption(new Option('-q, --quiet', 'Suppress non-error logs').conflicts('verbose'))
     .addHelpText(
       'after',
-      `\nEnvironment variables:\n  GITHUB_TOKEN           Required unless --token is provided\n  GITHUB_USERNAME        Username, otherwise auto-detected from token\n  EXCLUDE_REPOS          Comma-separated repos to exclude (default: none)\n  HIDE_OWNERS            Comma-separated owners to hide (default: none)\n  WIDTH                  SVG width in pixels (default ${DEFAULT_CONFIG.width})\n  HEIGHT                 SVG height in pixels (default ${DEFAULT_CONFIG.height})\n  GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default ${DEFAULT_GITHUB_CONFIG.timeoutMs})\n  GITHUB_BASE_URL        GitHub GraphQL API base URL (default ${DEFAULT_GITHUB_CONFIG.baseUrl})\n  VERBOSE=1              Enable verbose logs\n  QUIET=1                Suppress non-error logs\n  DEBUG=1                Alias for verbose`
+      `\nEnvironment variables:\n  GITHUB_TOKEN           Required unless --token is provided\n  GITHUB_USERNAME        Username, otherwise auto-detected from token\n  EXCLUDE_REPOS          Comma-separated repos to exclude (default: none)\n  EXCLUDE_OWNERS            Comma-separated owners to hide (default: none)\n  WIDTH                  SVG width in pixels (default ${DEFAULT_CONFIG.width})\n  HEIGHT                 SVG height in pixels (default ${DEFAULT_CONFIG.height})\n  GITHUB_TIMEOUT_MS      GitHub API timeout in ms (default ${DEFAULT_GITHUB_CONFIG.timeoutMs})\n  GITHUB_BASE_URL        GitHub GraphQL API base URL (default ${DEFAULT_GITHUB_CONFIG.baseUrl})\n  VERBOSE=1              Enable verbose logs\n  QUIET=1                Suppress non-error logs\n  DEBUG=1                Alias for verbose`
     )
     .showHelpAfterError()
     .showSuggestionAfterError();
@@ -70,7 +70,7 @@ async function main() {
     width: number;
     height: number;
     excludeRepos: string[] | string;
-    hideOwners: string[] | string;
+    excludeOwners: string[] | string;
     timeout: number;
     githubBaseUrl: string;
     verbose?: boolean;
@@ -85,9 +85,9 @@ async function main() {
   const excludeRepos: string[] = Array.isArray(options.excludeRepos)
     ? options.excludeRepos
     : (options.excludeRepos ? parseList(String(options.excludeRepos)) : []);
-  const hideOwners: string[] = Array.isArray(options.hideOwners)
-    ? options.hideOwners
-    : (options.hideOwners ? parseList(String(options.hideOwners)) : []);
+  const excludeOwners: string[] = Array.isArray(options.excludeOwners)
+    ? options.excludeOwners
+    : (options.excludeOwners ? parseList(String(options.excludeOwners)) : []);
 
   if (!options.token) {
     console.error('❌ GitHub token is required');
@@ -112,7 +112,7 @@ async function main() {
       }
 
       if (excludeRepos.length > 0) console.log(`🚫 Excluding repos: ${excludeRepos.join(', ')}`);
-      if (hideOwners.length > 0) console.log(`🚫 Hiding owners: ${hideOwners.join(', ')}`);
+      if (excludeOwners.length > 0) console.log(`🚫 Excluding owners: ${excludeOwners.join(', ')}`);
 
       if (options.output) console.log(`📁 Output file: ${options.output}`);
       else console.log('📁 Output: stdout');
@@ -126,7 +126,7 @@ async function main() {
       width: options.width,
       height: options.height,
       excludeRepos,
-      hideOwners,
+      excludeOwners,
       timeoutMs: options.timeout,
       githubBaseUrl: options.githubBaseUrl,
     });

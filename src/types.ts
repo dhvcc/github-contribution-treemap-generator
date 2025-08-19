@@ -22,7 +22,7 @@ export interface TreemapOptions {
   width?: number;
   height?: number;
   excludeRepos?: string[];
-  hideOwners?: string[];
+  excludeOwners?: string[];
   username?: string;
 }
 

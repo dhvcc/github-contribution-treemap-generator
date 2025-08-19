@@ -27,7 +27,7 @@ export async function generateContributionTreemap(
     width?: number;
     height?: number;
     excludeRepos?: string[];
-    hideOwners?: string[];
+    excludeOwners?: string[];
     config?: Partial<import('./types').TreemapConfig>;
     timeoutMs?: number;
     githubBaseUrl?: string;
@@ -38,7 +38,7 @@ export async function generateContributionTreemap(
     width = DEFAULT_CONFIG.width,
     height = DEFAULT_CONFIG.height,
     excludeRepos = [],
-    hideOwners = [],
+    excludeOwners = [],
     config = {},
     timeoutMs = DEFAULT_GITHUB_CONFIG.timeoutMs,
     githubBaseUrl = DEFAULT_GITHUB_CONFIG.baseUrl,
@@ -56,7 +56,7 @@ export async function generateContributionTreemap(
   const normalizedRepos = normalizeRepositories(rawRepos, {
     username: resolvedUsername,
     excludeReposSet: new Set(excludeRepos.map((s) => s.toLowerCase())),
-    hideOwnersSet: new Set(hideOwners.map((s) => s.toLowerCase())),
+    excludeOwnersSet: new Set(excludeOwners.map((s) => s.toLowerCase())),
   });
 
   if (normalizedRepos.length === 0) {
@@ -78,10 +78,10 @@ function normalizeRepositories(
   options: {
     username: string;
     excludeReposSet: Set<string>;
-    hideOwnersSet: Set<string>;
+    excludeOwnersSet: Set<string>;
   }
 ): import('./types').NormalizedRepository[] {
-  const { username, excludeReposSet, hideOwnersSet } = options;
+  const { username, excludeReposSet, excludeOwnersSet } = options;
   const filtered: import('./types').NormalizedRepository[] = [];
 
   for (const repo of repos) {
@@ -92,7 +92,7 @@ function normalizeRepositories(
     const keyFull = nameWithOwner.toLowerCase();
 
     if (excludeReposSet.has(keyName) || excludeReposSet.has(keyFull)) continue;
-    if (hideOwnersSet.has(owner.toLowerCase())) continue;
+    if (excludeOwnersSet.has(owner.toLowerCase())) continue;
 
     const isOwnedByUser = owner.toLowerCase() === String(username).toLowerCase();
     if (isOwnedByUser) continue;
